@@ -18,7 +18,7 @@ export default async function AdminDashboard(params: {
   return (
     <div className="min-h-screen p-10">
       <h1>This is the admin dashboard</h1>
-      <p>This page is restricted to users with the 'admin' role.</p>
+      <p>This page is restricted to users with the &#39;admin&#39; role.</p>
 
       <SearchUsers />
 
