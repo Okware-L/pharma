@@ -19,6 +19,10 @@ module.exports = {
     extend: {
       backgroundImage: {
         hero: "url('/doc.jpg')",
+        contentbg: "url('/hosi.jpg')",
+        content1: "url('/content1.jpg')",
+        content2: "url('/content2.jpg')",
+        content3: "url('/content3.jpg')",
       },
       colors: {
         border: "hsl(var(--border))",

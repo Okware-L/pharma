@@ -128,6 +128,13 @@ export default function Navbar() {
                 </NavigationMenuLink>
               </Link>
             </NavigationMenuItem>
+            <NavigationMenuItem>
+              <Link href="https://jmqafri.com/careers" legacyBehavior passHref>
+                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                  Careers
+                </NavigationMenuLink>
+              </Link>
+            </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
       </div>
