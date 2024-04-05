@@ -9,7 +9,7 @@ import { collection, addDoc } from "firebase/firestore";
 import { Input } from "../../components/ui/input";
 import { Textarea } from "../../components/ui/textarea";
 
-export default function page() {
+export default function Page() {
   const [application, setApplication] = useState({
     fullName: "",
     email: "",
