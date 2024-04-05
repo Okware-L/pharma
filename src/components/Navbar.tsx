@@ -31,11 +31,16 @@ const components: { title: string; href: string; description: string }[] = [
     href: "/emergencies",
     description: "Air lift or get an ambulance near you, now.",
   },
+  {
+    title: "Our Stories",
+    href: "/",
+    description: "JM-Qafri catalogue",
+  },
 ];
 
 export default function Navbar() {
   return (
-    <div className="navbar bg-gray-100">
+    <div className="navbar bg-gray-100 sm:px-20">
       <div className="navbar-start">
         <div className="dropdown">
           <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
@@ -85,7 +90,7 @@ export default function Navbar() {
         <NavigationMenu>
           <NavigationMenuList>
             <NavigationMenuItem>
-              <NavigationMenuTrigger>Consult</NavigationMenuTrigger>
+              <NavigationMenuTrigger>Consult A Doctor</NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
                   <ListItem href="/" title="Video Consultation">

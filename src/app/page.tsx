@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/button";
 export default function Home() {
   return (
     <>
-      <div className="w-screen min-h-screen  bg-gradient-to-r from-sky-300 to-sky-100">
+      <div className="w-screen min-h-screen  bg-gray-100">
         <Navbar />
-        <div className="sm:px-40 px-5 mt-10">
+        <div className="sm:px-20 px-5 ">
           <Hero />
         </div>
       </div>
