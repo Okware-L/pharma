@@ -5,13 +5,30 @@ import { Footer } from "@/components/Footer";
 import React, { useState } from "react";
 import { db } from "../../../firebaseConfig";
 import { collection, addDoc } from "firebase/firestore";
-//import { toast } from "sonner";
+import { toast } from "sonner";
 import { Input } from "../../components/ui/input";
 import { Textarea } from "../../components/ui/textarea";
 import { Button } from "../../components/ui/button";
+import Image from "next/image";
+
+interface Application {
+  fullName: string;
+  email: string;
+  experience: string;
+  resumeLink: string;
+  coverLetter: string;
+}
+
+interface FormErrors {
+  fullName: string;
+  email: string;
+  experience: string;
+  resumeLink: string;
+  coverLetter: string;
+}
 
 export default function Page() {
-  const [application, setApplication] = useState({
+  const [application, setApplication] = useState<Application>({
     fullName: "",
     email: "",
     experience: "",
@@ -19,7 +36,7 @@ export default function Page() {
     coverLetter: "",
   });
 
-  const [formErrors, setFormErrors] = useState({
+  const [formErrors, setFormErrors] = useState<FormErrors>({
     fullName: "",
     email: "",
     experience: "",
@@ -27,7 +44,7 @@ export default function Page() {
     coverLetter: "",
   });
 
-  const isFormValid = (form) => {
+  const isFormValid = (form: Application): boolean => {
     return (
       form.fullName.trim() !== "" &&
       form.email.trim() !== "" &&
@@ -37,7 +54,7 @@ export default function Page() {
     );
   };
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
     setApplication((prevApplication) => ({
       ...prevApplication,
@@ -49,7 +66,9 @@ export default function Page() {
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>
+  ): Promise<void> => {
     e.preventDefault();
     if (isFormValid(application)) {
       try {
@@ -96,12 +115,15 @@ export default function Page() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-rose-100 to-teal-100">
+    <div className="min-h-screen bg-white">
       <Navbar />
       <div>
-        <h1 className="text-3xl text-center py-5">
-          Apply to be a doctor with JM-Qafri.
+        <h1 className="text-3xl text-center pt-5">
+          Apply to be a doctor with JM-Qafri
         </h1>
+        <div className="flex justify-center py-5">
+          <Image src="/doc.jpg" alt="doc" width="800" height="500" />
+        </div>
         <div className="">
           <p className="p-5 font-extralight my-5">
             Becoming a JMQafri doctor offers numerous benefits, combining
@@ -121,7 +143,7 @@ export default function Page() {
             well-rounded and personalized healthcare experience, contributing to
             improved outcomes and patient satisfaction.
           </p>
-          <div className="min-h-screen flex justify-center items-center bg-white p-5">
+          <div className="flex justify-center items-center p-5">
             <div className="w-full p-5 rounded-lg shadow-md">
               <h2 className="text-3xl font-light text-center mb-6 text-black">
                 Job Application Form
@@ -216,7 +238,7 @@ export default function Page() {
                     <p className="text-red-500">{formErrors.coverLetter}</p>
                   )}
 
-                  <button className="btn w-full bg-black hover:bg-gray-700 text-white">
+                  <button className="my-3 btn w-full bg-black hover:bg-gray-700 text-white">
                     Submit Application
                   </button>
                 </div>
