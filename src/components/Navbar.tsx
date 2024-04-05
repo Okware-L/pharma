@@ -102,6 +102,9 @@ export default function Navbar() {
                   <ListItem href="/" title="Book Appointment">
                     Scedule a meeting with one of our highly esteemed doctors
                   </ListItem>
+                  <ListItem href="/" title="Location specific">
+                    Get connected to a doctor in your area.
+                  </ListItem>
                 </ul>
               </NavigationMenuContent>
             </NavigationMenuItem>

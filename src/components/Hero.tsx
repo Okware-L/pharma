@@ -11,7 +11,7 @@ export default function Hero() {
       <main>
         <div className="text-white bg-sky-700 rounded-2xl hidden sm:flex mb-20">
           <div className="border-r p-3 flex mx-2 items-center ">
-            Pharmaceutical Distribution
+            Emergency services
             <ChevronRight />
           </div>
           <div className="border-r p-3 flex mx-2 items-center">
