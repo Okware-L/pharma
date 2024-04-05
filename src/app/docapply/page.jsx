@@ -8,6 +8,7 @@ import { collection, addDoc } from "firebase/firestore";
 //import { toast } from "sonner";
 import { Input } from "../../components/ui/input";
 import { Textarea } from "../../components/ui/textarea";
+import { Button } from "../../components/ui/button";
 
 export default function Page() {
   const [application, setApplication] = useState({
@@ -95,19 +96,37 @@ export default function Page() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gradient-to-r from-rose-100 to-teal-100">
       <Navbar />
       <div>
-        <h1 className="text-3xl text-center">
+        <h1 className="text-3xl text-center py-5">
           Apply to be a doctor with JM-Qafri.
         </h1>
-        <div>
-          <h1 className="text-center">Application Form</h1>
-          <div className="min-h-screen flex justify-center items-center p-5">
-            <div className="w-full p-5 bg-white rounded-lg shadow-md">
+        <div className="">
+          <p className="p-5 font-extralight my-5">
+            Becoming a JMQafri doctor offers numerous benefits, combining
+            traditional medical knowledge with modern practices to provide
+            comprehensive healthcare solutions. With a deep understanding of
+            both Eastern and Western medical approaches, JMQafri doctors can
+            offer patients a holistic treatment plan tailored to their
+            individual needs. This unique combination allows for a more
+            integrated approach to healthcare, addressing not only physical
+            ailments but also considering mental, emotional, and spiritual
+            well-being. JMQafri doctors often emphasize preventive care and
+            lifestyle changes, aiming to promote long-term health and wellness.
+            Additionally, their ability to incorporate traditional healing
+            methods can provide patients with alternative options for treatment,
+            offering a more diverse and inclusive approach to medicine. Overall,
+            becoming a JMQafri doctor enables practitioners to offer patients a
+            well-rounded and personalized healthcare experience, contributing to
+            improved outcomes and patient satisfaction.
+          </p>
+          <div className="min-h-screen flex justify-center items-center bg-white p-5">
+            <div className="w-full p-5 rounded-lg shadow-md">
               <h2 className="text-3xl font-light text-center mb-6 text-black">
                 Job Application Form
               </h2>
+
               <form onSubmit={handleSubmit}>
                 <div className="mb-4">
                   <label
@@ -196,13 +215,11 @@ export default function Page() {
                   {formErrors.coverLetter && (
                     <p className="text-red-500">{formErrors.coverLetter}</p>
                   )}
+
+                  <button className="btn w-full bg-black hover:bg-gray-700 text-white">
+                    Submit Application
+                  </button>
                 </div>
-                <button
-                  type="submit"
-                  className="w-full bg-gray-900 text-white py-2 px-4 rounded-md hover:bg-gray-800"
-                >
-                  Submit Application
-                </button>
               </form>
             </div>
           </div>
