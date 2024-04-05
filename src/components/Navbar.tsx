@@ -94,16 +94,16 @@ export default function Navbar() {
               <NavigationMenuTrigger>Consult A Doctor</NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-                  <ListItem href="/" title="Video Consultation">
+                  <ListItem href="/consult" title="Video Consultation">
                     Live video calls with expoert physicians
                   </ListItem>
-                  <ListItem href="/" title="Chat with a doctor">
+                  <ListItem href="/consult" title="Chat with a doctor">
                     Message with a doctor
                   </ListItem>
-                  <ListItem href="/" title="Book Appointment">
+                  <ListItem href="/consult" title="Book Appointment">
                     Scedule a meeting with one of our highly esteemed doctors
                   </ListItem>
-                  <ListItem href="/" title="Location specific">
+                  <ListItem href="/consult" title="Location specific">
                     Get connected to a doctor in your area.
                   </ListItem>
                 </ul>
@@ -145,7 +145,7 @@ export default function Navbar() {
       <div className="navbar-end">
         <SignedIn>
           {/* Mount the UserButton component */}
-          <UserButton />
+          <UserButton afterSignOutUrl="/" />
         </SignedIn>
         <SignedOut>
           {/* Signed out users get sign in button */}

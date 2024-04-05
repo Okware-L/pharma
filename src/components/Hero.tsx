@@ -23,7 +23,7 @@ export default function Hero() {
             <ChevronRight />
           </div>
           <div className="border-r p-3 flex mx-2 items-center">
-            For Physicians
+            <a href="/docapply">For Physicians</a>
             <ChevronRight />
           </div>
           <div className="p-3 border-r flex mx-2 items-center">
