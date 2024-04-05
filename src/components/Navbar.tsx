@@ -14,6 +14,7 @@ import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import Link from "next/link";
+import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 
 const components: { title: string; href: string; description: string }[] = [
   {
@@ -142,7 +143,14 @@ export default function Navbar() {
         </NavigationMenu>
       </div>
       <div className="navbar-end">
-        <a className="btn btn-ghost">Sign Up/ Sign In</a>
+        <SignedIn>
+          {/* Mount the UserButton component */}
+          <UserButton />
+        </SignedIn>
+        <SignedOut>
+          {/* Signed out users get sign in button */}
+          <SignInButton />
+        </SignedOut>
       </div>
     </div>
   );
