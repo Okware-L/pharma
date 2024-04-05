@@ -38,7 +38,7 @@ export default function Hero() {
         <div className="grid sm:grid-cols-2">
           <div className="bg-gray-200 rounded-l-2xl py-10">
             <h1 className="text-4xl font-medium text-left p-5">
-              Touching Virtually Every Aspect of Health
+              JM-Qafri, we are right there with you
             </h1>
             <Image
               src="/doc.jpg"
