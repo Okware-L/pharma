@@ -23,7 +23,7 @@ const View = () => {
             Your profile,{" "}
             <span className="text-sky-800 font-bold">{user.fullName}</span>
           </h1>
-          <div>hm</div>
+          <div></div>
         </div>
         <Footer />
       </div>

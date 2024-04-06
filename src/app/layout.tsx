@@ -17,7 +17,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <ClerkProvider>
-        <body className={inter.className}>{children}</body>
+        <body className={inter.className}>
+          <link rel="icon" href="/jmlogoblack.svg" sizes="any" />
+          {children}
+        </body>
       </ClerkProvider>
     </html>
   );
