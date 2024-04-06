@@ -1,7 +1,7 @@
 "use client";
 
 import Navbar from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
+import Footer from "@/components/Footer";
 import React, { useState } from "react";
 import { db } from "../../../firebaseConfig";
 import { collection, addDoc } from "firebase/firestore";
@@ -83,7 +83,6 @@ export default function Page() {
 
         //toast ?
         toast("Application submitted successfully", {
-          variant: "success",
           duration: 5000,
         });
 
@@ -92,7 +91,6 @@ export default function Page() {
         console.error("Error submitting application:", error);
 
         toast("Failed to submit application", {
-          variant: "error",
           duration: 5000,
         });
         window.location.reload();
@@ -119,7 +117,7 @@ export default function Page() {
       <Navbar />
       <div>
         <h1 className="text-3xl text-center pt-5">
-          Apply to be a doctor with JM-Qafri
+          The best way to grow your practice and professional network.
         </h1>
         <div className="flex justify-center py-5">
           <Image src="/doc.jpg" alt="doc" width="800" height="500" />
@@ -136,12 +134,6 @@ export default function Page() {
             ailments but also considering mental, emotional, and spiritual
             well-being. JMQafri doctors often emphasize preventive care and
             lifestyle changes, aiming to promote long-term health and wellness.
-            Additionally, their ability to incorporate traditional healing
-            methods can provide patients with alternative options for treatment,
-            offering a more diverse and inclusive approach to medicine. Overall,
-            becoming a JMQafri doctor enables practitioners to offer patients a
-            well-rounded and personalized healthcare experience, contributing to
-            improved outcomes and patient satisfaction.
           </p>
           <div className="flex justify-center items-center p-5">
             <div className="w-full p-5 rounded-lg shadow-md">
@@ -229,11 +221,13 @@ export default function Page() {
                   </label>
                   <Textarea
                     name="coverLetter"
-                    rows="4"
+                    // rows="4"
                     value={application.coverLetter}
-                    onChange={handleChange}
+                    // onChange={handleChange}
                     className="mt-1 p-2 w-full border-gray-300 rounded-md"
-                  ></Textarea>
+                  >
+                    h
+                  </Textarea>
                   {formErrors.coverLetter && (
                     <p className="text-red-500">{formErrors.coverLetter}</p>
                   )}

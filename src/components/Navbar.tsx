@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useEffect } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 //import { Icons } from "@/components/icons";
@@ -14,7 +15,14 @@ import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import Link from "next/link";
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  UserButton,
+  useAuth,
+} from "@clerk/nextjs";
+import { useClerkAuth } from "../signIn";
 
 const components: { title: string; href: string; description: string }[] = [
   {
@@ -40,8 +48,10 @@ const components: { title: string; href: string; description: string }[] = [
 ];
 
 export default function Navbar() {
+  const { signInWithClerk } = useClerkAuth();
+
   return (
-    <div className="navbar bg-gray-100 sm:px-20">
+    <div className="navbar bg-gray-100 sm:px-20 border-b border-sky-800">
       <div className="navbar-start">
         <div className="dropdown">
           <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
@@ -145,10 +155,19 @@ export default function Navbar() {
       <div className="navbar-end">
         <SignedIn>
           {/* Mount the UserButton component */}
-          <UserButton afterSignOutUrl="/" />
+          <div className="flex justify-center items-center">
+            <Link href={"/view"}>
+              <button className="mx-3 text-sm font-base">View Profile</button>
+            </Link>
+          </div>
+          <UserButton afterSignOutUrl="/" userProfileUrl="/profile" />
         </SignedIn>
+
         <SignedOut>
           {/* Signed out users get sign in button */}
+          <button onClick={signInWithClerk} className="btn btn-ghost hidden">
+            sign In/ Up
+          </button>
           <SignInButton />
         </SignedOut>
       </div>
