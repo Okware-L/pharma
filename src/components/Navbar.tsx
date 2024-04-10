@@ -104,16 +104,16 @@ export default function Navbar() {
               <NavigationMenuTrigger>Consult A Doctor</NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-                  <ListItem href="/consult" title="Video Consultation">
+                  <ListItem href="/video" title="Video Consultation">
                     Live video calls with expoert physicians
                   </ListItem>
-                  <ListItem href="/consult" title="Chat with a doctor">
+                  <ListItem href="/chat" title="Chat with a doctor">
                     Message with a doctor
                   </ListItem>
-                  <ListItem href="/consult" title="Book Appointment">
+                  <ListItem href="/appointment" title="Book Appointment">
                     Scedule a meeting with one of our highly esteemed doctors
                   </ListItem>
-                  <ListItem href="/consult" title="Location specific">
+                  <ListItem href="/location" title="Location specific">
                     Get connected to a doctor in your area.
                   </ListItem>
                 </ul>

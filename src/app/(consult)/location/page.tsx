@@ -6,7 +6,7 @@ export default function Audio() {
   return (
     <div className="min-h-screen w-screen ">
       <Navbar />
-      <div>Audio call</div>
+      <div>Location</div>
       <Footer />
     </div>
   );
