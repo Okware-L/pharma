@@ -221,13 +221,11 @@ export default function Page() {
                   </label>
                   <Textarea
                     name="coverLetter"
-                    // rows="4"
+                    //rows="4"
                     value={application.coverLetter}
-                    // onChange={handleChange}
+                    //onChange={handleChange}
                     className="mt-1 p-2 w-full border-gray-300 rounded-md"
-                  >
-                    h
-                  </Textarea>
+                  ></Textarea>
                   {formErrors.coverLetter && (
                     <p className="text-red-500">{formErrors.coverLetter}</p>
                   )}
