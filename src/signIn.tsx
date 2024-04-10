@@ -10,12 +10,11 @@ export const useClerkAuth = () => {
     const auth = getAuth(app);
 
     const token = await getToken({ template: "integration_firebase" });
-    if (token) {
-      const userCredentials = await signInWithCustomToken(auth, token);
-      console.log("user ::", userCredentials.user);
-    } else {
-      console.error("Token is null");
+    if (!token) {
+      return;
     }
+    const userCredentials = await signInWithCustomToken(auth, token);
+    console.log("user ::", userCredentials.user);
   };
 
   return { signInWithClerk };

@@ -4,9 +4,6 @@ import React from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useUser } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
-import Link from "next/link";
 
 const View = () => {
   const { isLoaded, isSignedIn, user } = useUser();
