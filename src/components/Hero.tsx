@@ -3,6 +3,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
+import Link from "next/link";
 import Image from "next/image";
 
 export default function Hero() {
@@ -22,10 +23,12 @@ export default function Hero() {
             Pharmacy services & Technology
             <ChevronRight />
           </div>
-          <div className="border-r p-3 flex mx-2 items-center">
-            <a href="/docapply">For Physicians</a>
-            <ChevronRight />
-          </div>
+          <Link href="/docapply">
+            <div className="border-r p-3 flex mx-2 items-center">
+              For Physicians
+              <ChevronRight />
+            </div>
+          </Link>
           <div className="p-3 border-r flex mx-2 items-center">
             Our Locations
             <ChevronRight />
