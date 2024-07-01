@@ -58,8 +58,8 @@ export default async function AdminDashboard(params: {
             <div>
               <form action={setRole}>
                 <input type="hidden" value={user.id} name="id" />
-                <input type="hidden" value="moderator" name="role" />
-                <button type="submit">Make Moderator</button>
+                <input type="hidden" value="doctor" name="role" />
+                <button type="submit">Make Doctor</button>
               </form>
             </div>
           </div>
