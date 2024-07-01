@@ -10,26 +10,26 @@ export default function Hero() {
   return (
     <>
       <main>
-        <div className="text-white bg-sky-700 rounded-2xl hidden sm:flex mb-20 mt-3">
-          <div className="border-r p-3 flex mx-2 items-center ">
+        <div className="text-white bg-sky-700 rounded-2xl hidden sm:flex mb-10 mt-3">
+          <div className="md:border-r p-3 flex mx-2 items-center ">
             Emergency services
             <ChevronRight />
           </div>
-          <div className="border-r p-3 flex mx-2 items-center">
+          <div className="md:border-r p-3 flex mx-2 items-center">
             Symptom Checker
             <ChevronRight />
           </div>
-          <div className="border-r p-3 flex mx-2 items-center">
+          <div className="md:border-r p-3 flex mx-2 items-center">
             Pharmacy services & Technology
             <ChevronRight />
           </div>
           <Link href="/docapply">
-            <div className="border-r p-3 flex mx-2 items-center">
+            <div className="md:border-r p-3 flex mx-2 items-center">
               For Physicians
               <ChevronRight />
             </div>
           </Link>
-          <div className="p-3 border-r flex mx-2 items-center">
+          <div className="p-3 md:border-r flex mx-2 items-center">
             Our Locations
             <ChevronRight />
           </div>
@@ -38,11 +38,12 @@ export default function Hero() {
             <ChevronRight />
           </div>
         </div>
+
+        <h1 className="text-4xl font-light text-left p-5">
+          JM-Qafri, right here, with you.
+        </h1>
         <div className="grid sm:grid-cols-2 mt-5">
           <div className="bg-gray-200 rounded-l-2xl py-10">
-            <h1 className="text-4xl font-medium text-left p-5">
-              JM-Qafri, we are right here, with you.
-            </h1>
             <Image
               src="/doc.jpg"
               alt="hm"

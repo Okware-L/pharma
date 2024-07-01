@@ -14,6 +14,15 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+
 import Link from "next/link";
 import {
   SignedIn,
@@ -23,6 +32,7 @@ import {
   useAuth,
 } from "@clerk/nextjs";
 import { useClerkAuth } from "../signIn";
+import { ChevronRight } from "lucide-react";
 
 const components: { title: string; href: string; description: string }[] = [
   {
@@ -51,54 +61,82 @@ export default function Navbar() {
   const { signInWithClerk } = useClerkAuth();
 
   return (
-    <div className="navbar bg-gray-100 sm:px-20 border-b border-sky-800">
-      <div className="navbar-start">
-        <div className="dropdown">
-          <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M4 6h16M4 12h8m-8 6h16"
-              />
-            </svg>
-          </div>
-          <ul
-            tabIndex={0}
-            className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-gradient-to-r from-gray-100 to-gray-300 rounded-box w-52"
-          >
-            <li>
-              <a>Consult</a>
-            </li>
-            <li>
-              <a>Parent</a>
-              <ul className="p-2">
-                <li>
-                  <a>Video</a>
-                </li>
-                <li>
-                  <a>Chat</a>
-                </li>
-              </ul>
-            </li>
-            <li>
-              <a>Pharmacy</a>
-            </li>
-          </ul>
-        </div>
-        <a href="/">
+    <div className="navbar flex p-4 justify-between items-center bg-gray-100 sm:px-20 border-b border-sky-800">
+      <div className="">
+        <a href="/" className="hidden md:block">
           <Image src="/jmlogoblack.svg" alt="img" width="84" height="54" />
         </a>
+        <div className="dropdown md:hidden">
+          <Sheet>
+            <SheetTrigger>
+              <div
+                tabIndex={0}
+                role="button"
+                className="btn btn-ghost lg:hidden"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M4 6h16M4 12h8m-8 6h16"
+                  />
+                </svg>
+              </div>
+            </SheetTrigger>
+            <SheetContent className="w-[400px] sm:w-[540px]" side="left">
+              <SheetHeader>
+                <SheetTitle>
+                  <h2 className="font-light text-xl text-left">
+                    Select Service.
+                  </h2>
+                </SheetTitle>
+                <SheetDescription>
+                  <div className="text-slate-900 bg-sky-200 rounded-2xl sm:flex mb-10 mt-3">
+                    <div className="md:border-r border-b border-white p-3 flex mx-2 items-center ">
+                      Emergency services
+                      <ChevronRight />
+                    </div>
+                    <div className="md:border-r border-b border-white p-3 flex mx-2 items-center">
+                      Symptom Checker
+                      <ChevronRight />
+                    </div>
+                    <div className="md:border-r border-b border-white p-3 flex mx-2 items-center">
+                      Pharmacy services & Technology
+                      <ChevronRight />
+                    </div>
+                    <Link href="/docapply">
+                      <div className="md:border-r border-b border-white p-3 flex mx-2 items-center">
+                        For Physicians
+                        <ChevronRight />
+                      </div>
+                    </Link>
+                    <div className="p-3 md:border-r  border-b border-white flex mx-2 items-center">
+                      Our Locations
+                      <ChevronRight />
+                    </div>
+                    <div className="p-3 flex mx-2 items-center">
+                      Education & Research
+                      <ChevronRight />
+                    </div>
+                  </div>
+                </SheetDescription>
+              </SheetHeader>
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
-      <div className="navbar-center hidden lg:flex">
-        <NavigationMenu>
+      <div className=" lg:flex">
+        <a href="/" className="md:hidden">
+          <Image src="/jmlogoblack.svg" alt="img" width="84" height="54" />
+        </a>
+        <NavigationMenu className="hidden md:block">
           <NavigationMenuList>
             <NavigationMenuItem>
               <NavigationMenuTrigger>Consult A Doctor</NavigationMenuTrigger>
