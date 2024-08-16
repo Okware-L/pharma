@@ -1,15 +1,13 @@
 import "../globals.css";
-import type { Metadata } from "next";
 
-const defaultUrl = "http://localhost:3000";
+const defaultUrl = process.env.VERCEL_URL
+  ? `https://${process.env.VERCEL_URL}`
+  : "http://localhost:3000";
 
-export const metadata: Metadata = {
-  title: "Jm-Qafri Pharma",
-  description:
-    "A healthcare patient management System designed to streamline patient registration, appointment scheduling, and medical records management for healthcare providers.",
-  icons: {
-    icon: "/jmwhite.svg",
-  },
+export const metadata = {
+  metadataBase: new URL(defaultUrl),
+  title: "Next.js and Supabase Starter Kit",
+  description: "The fastest way to build apps with Next.js and Supabase",
 };
 
 export default function RootLayout({
