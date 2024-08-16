@@ -1,0 +1,106 @@
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  directUrl         = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+
+model Patient {
+  id                String   @id @default(uuid())
+  name              String
+  email             String   @unique
+  dateOfBirth       DateTime
+  gender            String
+  contactNumber     String
+  address           String
+  bloodType         String
+  allergies         String[]
+  chronicConditions String[]
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  appointments Appointment[]
+  doctorNotes  DoctorNote[]
+  vitalSigns   VitalSigns[]
+  labResults   LabResult[]
+
+  @@index([email])
+}
+
+model Doctor {
+  id         String   @id @default(uuid())
+  name       String
+  email      String   @unique
+  specialty  String
+  phone      String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  appointments Appointment[]
+  doctorNotes  DoctorNote[]
+
+  @@index([email])
+}
+
+model Appointment {
+  id        String   @id @default(uuid())
+  dateTime  DateTime
+  type      String
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  patient   Patient @relation(fields: [patientId], references: [id])
+  patientId String
+  doctor    Doctor  @relation(fields: [doctorId], references: [id])
+  doctorId  String
+
+  @@index([patientId, doctorId])
+}
+
+model DoctorNote {
+  id        String   @id @default(uuid())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  patient   Patient @relation(fields: [patientId], references: [id])
+  patientId String
+  doctor    Doctor  @relation(fields: [doctorId], references: [id])
+  doctorId  String
+
+  @@index([patientId, doctorId])
+}
+
+model VitalSigns {
+  id                 String   @id @default(uuid())
+  bloodPressure      String
+  heartRate          Int
+  temperature        Float
+  respiratoryRate    Int
+  oxygenSaturation   Int
+  recordedAt         DateTime @default(now())
+
+  patient   Patient @relation(fields: [patientId], references: [id])
+  patientId String
+
+  @@index([patientId])
+}
+
+model LabResult {
+  id        String   @id @default(uuid())
+  testName  String
+  result    String
+  unit      String
+  normalRange String
+  recordedAt DateTime @default(now())
+
+  patient   Patient @relation(fields: [patientId], references: [id])
+  patientId String
+
+  @@index([patientId])
+}
