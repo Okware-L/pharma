@@ -1,8 +1,8 @@
 "use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronRight, AlignLeft } from "lucide-react";
-
+import { ChevronRight, AlignLeft, User } from "lucide-react";
 import React from "react";
 import {
   NavigationMenu,
@@ -13,7 +13,6 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
-
 import {
   Sheet,
   SheetContent,
@@ -23,8 +22,9 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/components/auth-provider";
 
 const components: { title: string; href: string; description: string }[] = [
   {
@@ -50,6 +50,8 @@ const components: { title: string; href: string; description: string }[] = [
 ];
 
 export default function Navbar() {
+  const { user } = useAuth();
+
   return (
     <div className="navbar flex p-4 justify-between items-center bg-slate-50 sm:px-20 border-b border-sky-800">
       <div className="">
@@ -123,7 +125,7 @@ export default function Navbar() {
                     href="/initialregistration"
                     title="Video Consultation"
                   >
-                    Live video calls with expoert physicians
+                    Live video calls with expert physicians
                   </ListItem>
                   <ListItem
                     href="/initialregistration"
@@ -135,7 +137,7 @@ export default function Navbar() {
                     href="/initialregistration"
                     title="Book Appointment"
                   >
-                    Scedule a meeting with one of our highly esteemed doctors
+                    Schedule a meeting with one of our highly esteemed doctors
                   </ListItem>
                   <ListItem href="/location" title="Location specific">
                     Get connected to a doctor in your area.
@@ -177,15 +179,18 @@ export default function Navbar() {
         </NavigationMenu>
       </div>
       <div className="navbar-end">
-        {/* Mount the UserButton component */}
-        <Link href="/patient">
-          <div className="flex space-x-3">
-            <Avatar>
-              <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
-          </div>
-        </Link>
+        {user ? (
+          <Link href="/patient">
+            <div className="flex items-center space-x-2 hover:animate-pulse">
+              <User size={20} />
+              <span className="text-sm font-medium">{user.email}</span>
+            </div>
+          </Link>
+        ) : (
+          <Link href="/login" passHref>
+            <Button variant="outline">Sign In / Sign Up</Button>
+          </Link>
+        )}
       </div>
     </div>
   );
