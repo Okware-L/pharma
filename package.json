@@ -10,7 +10,6 @@
     "emulators": "firebase emulators:start"
   },
   "dependencies": {
-    "@clerk/nextjs": "^5.2.13",
     "@hookform/resolvers": "^3.9.0",
     "@prisma/client": "^5.18.0",
     "@radix-ui/react-avatar": "^1.1.0",
@@ -22,9 +21,6 @@
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-tabs": "^1.1.0",
     "@radix-ui/react-toast": "^1.2.1",
-    "@supabase/auth-helpers-nextjs": "^0.10.0",
-    "@supabase/ssr": "^0.4.0",
-    "@supabase/supabase-js": "^2.45.1",
     "bcrypt": "^5.1.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
