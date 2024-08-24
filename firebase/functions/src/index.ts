@@ -1,5 +1,5 @@
-import * as functions from "firebase-functions";
-import * as admin from "firebase-admin";
+import * as functions from 'firebase-functions';
+import * as admin from 'firebase-admin';
 
 admin.initializeApp();
 
@@ -9,7 +9,7 @@ interface User {
   email: string;
   displayName: string;
   photoURL: string;
-  role: "patient";
+  role: 'patient';
   createdAt: admin.firestore.Timestamp;
 }
 
@@ -42,30 +42,30 @@ export const createUserAndPatientDocuments = functions.auth
       // Prepare user data
       const userData: User = {
         uid: user.uid,
-        email: user.email || "",
-        displayName: user.displayName || "",
-        photoURL: user.photoURL || "",
-        role: "patient",
+        email: user.email || '',
+        displayName: user.displayName || '',
+        photoURL: user.photoURL || '',
+        role: 'patient',
         createdAt: getServerTimestamp() as any,
       };
 
-      console.log("Prepared user data:", userData);
+      console.log('Prepared user data:', userData);
 
       // Prepare patient data
       const patientData: Patient = {
         uid: user.uid,
-        email: user.email || "",
-        displayName: user.displayName || "",
+        email: user.email || '',
+        displayName: user.displayName || '',
         createdAt: getServerTimestamp() as any,
       };
 
-      console.log("Prepared patient data:", patientData);
+      console.log('Prepared patient data:', patientData);
 
       // Reference to the user document
-      const userRef = db.collection("users").doc(user.uid);
+      const userRef = db.collection('users').doc(user.uid);
 
       // Reference to the patient document
-      const patientRef = db.collection("patients").doc(user.uid);
+      const patientRef = db.collection('patients').doc(user.uid);
 
       // Set the user document
       batch.set(userRef, userData);
@@ -80,7 +80,7 @@ export const createUserAndPatientDocuments = functions.auth
       console.log(`User and patient documents created for ${user.uid}`);
       return null;
     } catch (error) {
-      console.error("Error in createUserAndPatientDocuments:", error);
+      console.error('Error in createUserAndPatientDocuments:', error);
       return null;
     }
   });
