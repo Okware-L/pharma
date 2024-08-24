@@ -25,6 +25,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/auth-provider";
+import AuthButton from "./AuthButton";
 
 const components: { title: string; href: string; description: string }[] = [
   {
@@ -179,18 +180,7 @@ export default function Navbar() {
         </NavigationMenu>
       </div>
       <div className="navbar-end">
-        {user ? (
-          <Link href="/patient">
-            <div className="flex items-center space-x-2 hover:animate-pulse">
-              <User size={20} />
-              <span className="text-sm font-medium">{user.email}</span>
-            </div>
-          </Link>
-        ) : (
-          <Link href="/login" passHref>
-            <Button variant="outline">Sign In / Sign Up</Button>
-          </Link>
-        )}
+        <AuthButton />
       </div>
     </div>
   );

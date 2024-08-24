@@ -30,7 +30,7 @@ export default function Hero() {
       </div>
 
       <h1 className="sm:text-5xl text-3xl text-white font-light text-center p-5 mb-8">
-        JM-Qafri, right here, with you.
+        Care that&apos;s always there, for you and your family
       </h1>
 
       <div className="grid text-slate-900 sm:grid-cols-2 gap-8 bg-gray-100 md:rounded-2xl overflow-hidden shadow-xl">
@@ -42,15 +42,14 @@ export default function Hero() {
             height="300"
             className="sm:hidden md:rounded-md mb-6"
           />
-          <p className="font-extralight mb-6 sm:text-lg p-3">
-            As a diversified healthcare leader, our solutions help patients
-            access life-changing healthcare solutions, create a real difference
-            for patients, and equip pharmacies, health systems and clinics with
-            technologies to operate more effectively. We do all of this and much
-            more as we pursue our mission to improve health outcomes for all.
+          <p className="font mb-6 sm:text-lg p-3">
+            Comprehensive virtual healthcare for your overall well-being. Access
+            top-tier primary care physicians, mental health professionals, and
+            therapists online. Receive personalized, excellent medical attention
+            from the comfort of home.
           </p>
           <Button className="self-start bg-sky-950 hover:bg-sky-800 text-white px-8 py-3 rounded-full transition-colors m-3">
-            Learn How
+            Book Appointment
           </Button>
         </div>
         <div className="hidden md:block bg-hero bg-cover bg-center min-h-[400px]"></div>

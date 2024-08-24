@@ -1,9 +1,9 @@
-import LoginComponent from "./components/LoginForm";
+import Login from "./components/LoginForm";
 
 export default async function LoginPage() {
   return (
-    <div>
-      <LoginComponent />
+    <div className="">
+      <Login />
     </div>
   );
 }

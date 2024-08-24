@@ -11,9 +11,10 @@ import { useAuth } from "@/components/auth-provider";
 export default function Login() {
   const [email, setEmail] = useState("");
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, loginGoogle } = useAuth();
 
   useEffect(() => {
+    // Handle magic link sign-in
     const handleSignIn = async () => {
       const emailForSignIn = localStorage.getItem("emailForSignIn");
       if (emailForSignIn) {
@@ -25,11 +26,10 @@ export default function Login() {
         } else {
           console.error("Sign-in failed");
         }
-      } else {
-        console.error("No email found for sign-in");
       }
     };
 
+    // Check if the current URL is the result of a magic link sign-in
     if (
       typeof window !== "undefined" &&
       window.location.href.includes("apiKey")
@@ -39,8 +39,8 @@ export default function Login() {
   }, [router]);
 
   useEffect(() => {
+    // Redirect to patients page if user is already signed in
     if (user) {
-      // Redirect to patients page if user is already signed in
       router.push("/patient");
     }
   }, [user, router]);
@@ -56,30 +56,43 @@ export default function Login() {
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    try {
+      await loginGoogle();
+      // The user will be redirected in the useEffect hook if sign-in is successful
+    } catch (error) {
+      console.error("Error signing in with Google:", error);
+      alert("Error signing in with Google. Please try again.");
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-center">Welcome to EHR System</CardTitle>
+          <CardTitle className="text-center">JM-Qafri Medicine</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleMagicLinkSignIn}>
-            <div className="space-y-4">
-              <Input
-                id="email-address"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                placeholder="Email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              <Button type="submit" className="w-full">
-                Sign in with Magic Link
-              </Button>
-            </div>
+          <form onSubmit={handleMagicLinkSignIn} className="space-y-4">
+            <Input
+              id="email-address"
+              name="email"
+              type="email"
+              autoComplete="email"
+              required
+              placeholder="Email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <Button type="submit" className="w-full">
+              Sign in with Magic Link
+            </Button>
           </form>
+          <div className="mt-4">
+            <Button onClick={handleGoogleSignIn} className="w-full">
+              Sign in with Google
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

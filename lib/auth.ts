@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { auth, db } from "./firebase";
 import { User } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
@@ -5,6 +6,7 @@ import {
   sendSignInLinkToEmail,
   isSignInWithEmailLink,
   signInWithEmailLink,
+  onAuthStateChanged,
 } from "firebase/auth";
 
 export type UserRole = "patient" | "doctor" | "admin";
@@ -42,7 +44,7 @@ export const completeSignIn = async (
       // If the user is new, set a default role
       if (!userRole) {
         await setDoc(doc(db, "users", result.user.uid), {
-          role: "patient", // Default role
+          role: "patient" as UserRole,
         });
       }
 
@@ -55,12 +57,12 @@ export const completeSignIn = async (
   return null;
 };
 
-export const getUserRole = async (uid: string): Promise<UserRole | null> => {
+export const getUserRole = async (uid: string): Promise<UserRole> => {
   const userDoc = await getDoc(doc(db, "users", uid));
   if (userDoc.exists()) {
     return userDoc.data().role as UserRole;
   }
-  return null;
+  return "patient"; // Default to 'patient' if no role is set
 };
 
 export const getCurrentUser = async (): Promise<EhrUser | null> => {
@@ -68,5 +70,27 @@ export const getCurrentUser = async (): Promise<EhrUser | null> => {
   if (!user) return null;
 
   const role = await getUserRole(user.uid);
-  return { ...user, role: role || "patient" } as EhrUser;
+  return { ...user, role } as EhrUser;
+};
+
+// New custom hook for accessing the current user
+export const useAuth = () => {
+  const [user, setUser] = useState<EhrUser | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        const role = await getUserRole(firebaseUser.uid);
+        setUser({ ...firebaseUser, role } as EhrUser);
+      } else {
+        setUser(null);
+      }
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  return { user, loading };
 };

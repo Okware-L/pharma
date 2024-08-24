@@ -19,30 +19,18 @@ export default function AdminPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-        <div>
-          <span className="mr-4">Welcome, {user?.email}</span>
-          <Button onClick={handleSignOut}>Sign Out</Button>
-        </div>
-      </div>
-      <AdminDashboard />
-
-      {/**
-          <RoleGuard allowedRoles={["admin"]}>
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-          <div>
-            <span className="mr-4">Welcome, {user?.email}</span>
-            <Button onClick={handleSignOut}>Sign Out</Button>
+      <RoleGuard allowedRoles={["admin"]}>
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+            <div>
+              <span className="mr-4">Welcome, {user?.email}</span>
+              <Button onClick={handleSignOut}>Sign Out</Button>
+            </div>
           </div>
+          <AdminDashboard />
         </div>
-        <AdminDashboard />
-      </div>
-    </RoleGuard>
-      
-      */}
+      </RoleGuard>
     </div>
   );
 }
