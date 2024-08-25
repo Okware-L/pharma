@@ -11,6 +11,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar } from "@/components/ui/calendar";
 import { toast } from "@/components/ui/use-toast";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import {
   Table,
   TableBody,
@@ -30,6 +32,7 @@ import {
   Timestamp,
   deleteDoc,
 } from "firebase/firestore";
+import { Input } from "@/components/ui/input";
 
 interface Appointment {
   id: string;
@@ -37,6 +40,8 @@ interface Appointment {
   patientName: string;
   status: string;
   patientId: string;
+  doctorId: string;
+  createdAt: Timestamp;
 }
 
 interface Patient {
@@ -51,9 +56,9 @@ export default function DoctorsPage() {
   const router = useRouter();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [patients, setPatients] = useState<Patient[]>([]);
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
-    new Date()
-  );
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     if (user) {
@@ -62,24 +67,21 @@ export default function DoctorsPage() {
     }
   }, [user]);
 
-  const handleSignOut = async () => {
-    await signOut(auth);
-    router.push("/");
-  };
-
   const fetchAppointments = async () => {
     if (!user) return;
+    setLoading(true);
     const appointmentsRef = collection(db, "appointments");
     const q = query(
       appointmentsRef,
       where("doctorId", "==", user.uid),
-      where("status", "in", ["pending", "confirmed"])
+      where("status", "in", ["scheduled", "confirmed", "pending"])
     );
     const querySnapshot = await getDocs(q);
     const fetchedAppointments: Appointment[] = querySnapshot.docs.map(
       (doc) => ({ id: doc.id, ...doc.data() } as Appointment)
     );
     setAppointments(fetchedAppointments);
+    setLoading(false);
   };
 
   const fetchPatients = async () => {
@@ -143,160 +145,225 @@ export default function DoctorsPage() {
     });
   };
 
+  const filteredPatients = patients.filter((patient) =>
+    patient.displayName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <RoleGuard allowedRoles={["doctor", "admin"]}>
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">Doctor Dashboard</h1>
-          <div>
-            <span className="mr-4">
-              Welcome, Dr. {user?.displayName || user?.email}
-            </span>
-            <Button onClick={handleSignOut}>Sign Out</Button>
+      <div className="min-h-screen bg-gray-100">
+        <Navbar />
+
+        <main className="container mx-auto px-4 py-8">
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-3xl font-bold text-gray-800">
+              Doctor Dashboard
+            </h1>
+            <Button variant="outline" onClick={() => signOut(auth)}>
+              Sign Out
+            </Button>
           </div>
-        </div>
 
-        <Tabs defaultValue="appointments" className="w-full">
-          <TabsList>
-            <TabsTrigger value="appointments">Appointments</TabsTrigger>
-            <TabsTrigger value="patients">Patients</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="appointments">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <Card>
               <CardHeader>
-                <CardTitle>Your Appointments</CardTitle>
+                <CardTitle className="text-lg font-semibold">
+                  Today's Appointments
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="flex space-x-4">
-                  <div className="w-1/3">
-                    <Calendar
-                      mode="single"
-                      selected={selectedDate}
-                      onSelect={setSelectedDate}
-                      className="rounded-md border"
+                <div className="text-3xl font-bold text-blue-600">
+                  {filterAppointmentsByDate(new Date()).length}
+                </div>
+                <p className="text-gray-600">Scheduled for today</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold">
+                  Total Patients
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-green-600">
+                  {patients.length}
+                </div>
+                <p className="text-gray-600">Registered patients</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold">
+                  Upcoming Tasks
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-orange-600">3</div>
+                <p className="text-gray-600">Pending actions</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Tabs defaultValue="appointments" className="w-full">
+            <TabsList className="mb-4">
+              <TabsTrigger value="appointments">Appointments</TabsTrigger>
+              <TabsTrigger value="patients">Patients</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="appointments">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-xl font-semibold">
+                    Your Appointments
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+                    <div className="w-full md:w-1/3">
+                      <Calendar
+                        mode="single"
+                        selected={selectedDate}
+                        onSelect={(date) => setSelectedDate(date || new Date())}
+                        className="rounded-md border"
+                      />
+                    </div>
+                    <div className="w-full md:w-2/3">
+                      {loading ? (
+                        <p>Loading appointments...</p>
+                      ) : (
+                        <Table>
+                          <TableCaption>
+                            List of appointments for{" "}
+                            {selectedDate.toDateString()}
+                          </TableCaption>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Time</TableHead>
+                              <TableHead>Patient</TableHead>
+                              <TableHead>Status</TableHead>
+                              <TableHead>Actions</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {filterAppointmentsByDate(selectedDate).map(
+                              (appointment) => (
+                                <TableRow key={appointment.id}>
+                                  <TableCell>
+                                    {appointment.date
+                                      .toDate()
+                                      .toLocaleTimeString()}
+                                  </TableCell>
+                                  <TableCell>
+                                    {appointment.patientName}
+                                  </TableCell>
+                                  <TableCell>{appointment.status}</TableCell>
+                                  <TableCell>
+                                    <Button
+                                      onClick={() =>
+                                        updateAppointmentStatus(
+                                          appointment.id,
+                                          "confirmed"
+                                        )
+                                      }
+                                      className="mr-2"
+                                    >
+                                      Confirm
+                                    </Button>
+                                    <Button
+                                      onClick={() =>
+                                        rescheduleAppointment(
+                                          appointment.id,
+                                          new Date()
+                                        )
+                                      }
+                                      className="mr-2"
+                                    >
+                                      Reschedule
+                                    </Button>
+                                    <Button
+                                      onClick={() =>
+                                        cancelAppointment(appointment.id)
+                                      }
+                                      variant="destructive"
+                                    >
+                                      Cancel
+                                    </Button>
+                                    {appointment.status === "confirmed" && (
+                                      <Button
+                                        onClick={() =>
+                                          updateAppointmentStatus(
+                                            appointment.id,
+                                            "completed"
+                                          )
+                                        }
+                                      >
+                                        Mark Completed
+                                      </Button>
+                                    )}
+                                  </TableCell>
+                                </TableRow>
+                              )
+                            )}
+                          </TableBody>
+                        </Table>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="patients">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-xl font-semibold">
+                    Your Patients
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="mb-4">
+                    <Input
+                      type="text"
+                      placeholder="Search patients..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
                     />
                   </div>
-                  <div className="w-2/3">
-                    <Table>
-                      <TableCaption>
-                        List of appointments for {selectedDate?.toDateString()}
-                      </TableCaption>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Time</TableHead>
-                          <TableHead>Patient</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead>Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {filterAppointmentsByDate(
-                          selectedDate || new Date()
-                        ).map((appointment) => (
-                          <TableRow key={appointment.id}>
-                            <TableCell>
-                              {appointment.date.toDate().toLocaleTimeString()}
-                            </TableCell>
-                            <TableCell>{appointment.patientName}</TableCell>
-                            <TableCell>{appointment.status}</TableCell>
-                            <TableCell>
-                              {appointment.status === "pending" && (
-                                <>
-                                  <Button
-                                    onClick={() =>
-                                      updateAppointmentStatus(
-                                        appointment.id,
-                                        "confirmed"
-                                      )
-                                    }
-                                    className="mr-2"
-                                  >
-                                    Confirm
-                                  </Button>
-                                  <Button
-                                    onClick={() =>
-                                      rescheduleAppointment(
-                                        appointment.id,
-                                        new Date()
-                                      )
-                                    }
-                                    className="mr-2"
-                                  >
-                                    Reschedule
-                                  </Button>
-                                  <Button
-                                    onClick={() =>
-                                      cancelAppointment(appointment.id)
-                                    }
-                                    variant="destructive"
-                                  >
-                                    Cancel
-                                  </Button>
-                                </>
-                              )}
-                              {appointment.status === "confirmed" && (
-                                <Button
-                                  onClick={() =>
-                                    updateAppointmentStatus(
-                                      appointment.id,
-                                      "completed"
-                                    )
-                                  }
-                                >
-                                  Mark Completed
-                                </Button>
-                              )}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="patients">
-            <Card>
-              <CardHeader>
-                <CardTitle>Your Patients</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableCaption>List of your patients</TableCaption>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Phone</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {patients.map((patient) => (
-                      <TableRow key={patient.id}>
-                        <TableCell>{patient.displayName}</TableCell>
-                        <TableCell>{patient.email}</TableCell>
-                        <TableCell>{patient.phoneNumber || "N/A"}</TableCell>
-                        <TableCell>
-                          <Button
-                            onClick={() =>
-                              router.push(`/patients/${patient.id}`)
-                            }
-                          >
-                            View Details
-                          </Button>
-                        </TableCell>
+                  <Table>
+                    <TableCaption>List of your patients</TableCaption>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Phone</TableHead>
+                        <TableHead>Actions</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredPatients.map((patient) => (
+                        <TableRow key={patient.id}>
+                          <TableCell>{patient.displayName}</TableCell>
+                          <TableCell>{patient.email}</TableCell>
+                          <TableCell>{patient.phoneNumber || "N/A"}</TableCell>
+                          <TableCell>
+                            <Button
+                              onClick={() =>
+                                router.push(`/patients/${patient.id}`)
+                              }
+                            >
+                              View Details
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </main>
+        <Footer />
       </div>
     </RoleGuard>
   );

@@ -119,34 +119,6 @@ export default function Navbar() {
         <NavigationMenu className="hidden md:block">
           <NavigationMenuList>
             <NavigationMenuItem>
-              <NavigationMenuTrigger>Consult A Doctor</NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-                  <ListItem
-                    href="/initialregistration"
-                    title="Video Consultation"
-                  >
-                    Live video calls with expert physicians
-                  </ListItem>
-                  <ListItem
-                    href="/initialregistration"
-                    title="Chat with a doctor"
-                  >
-                    Message with a doctor
-                  </ListItem>
-                  <ListItem
-                    href="/initialregistration"
-                    title="Book Appointment"
-                  >
-                    Schedule a meeting with one of our highly esteemed doctors
-                  </ListItem>
-                  <ListItem href="/location" title="Location specific">
-                    Get connected to a doctor in your area.
-                  </ListItem>
-                </ul>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
               <NavigationMenuTrigger>About</NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
