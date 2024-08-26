@@ -26,6 +26,14 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/auth-provider";
 import AuthButton from "./AuthButton";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { signOut } from "firebase/auth";
+import { auth } from "@/lib/firebase"; // Adjust this import based on your Firebase setup
 
 const components: { title: string; href: string; description: string }[] = [
   {
@@ -52,6 +60,38 @@ const components: { title: string; href: string; description: string }[] = [
 
 export default function Navbar() {
   const { user } = useAuth();
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error("Error signing out: ", error);
+    }
+  };
+
+  const ProfileButton = () => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+          <Avatar className="h-8 w-8">
+            <AvatarImage
+              src="/avatars/01.png"
+              alt={user?.email || "User avatar"}
+            />
+            <AvatarFallback>
+              {user?.email ? user.email.charAt(0).toUpperCase() : "U"}
+            </AvatarFallback>
+          </Avatar>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56" align="end" forceMount>
+        <DropdownMenuItem asChild>
+          <Link href="/patient">Dashboard</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={handleSignOut}>Sign out</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 
   return (
     <div className="navbar flex p-4 justify-between items-center bg-slate-50 sm:px-20 border-b border-sky-800">
@@ -152,7 +192,7 @@ export default function Navbar() {
         </NavigationMenu>
       </div>
       <div className="navbar-end">
-        <AuthButton />
+        {user ? <ProfileButton /> : <AuthButton />}
       </div>
     </div>
   );
