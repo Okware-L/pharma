@@ -15,7 +15,7 @@ export default function Hero() {
 
   return (
     <section className="p-6 bg-gradient-to-b from-sky-800 to-sky-700 rounded-3xl shadow-xl m-4">
-      <div className="text-white bg-sky-600/50 rounded-xl sm:flex mb-12 mt-6 p-4 gap-4 justify-between items-center hidden">
+      <div className="text-white bg-sky-600/50 rounded-xl sm:flex mb-12 mt-6 p-2 gap-3 justify-between items-center hidden">
         {services.map((service, index) => (
           <Link
             key={index}
@@ -23,7 +23,7 @@ export default function Hero() {
             className="group flex-1 min-w-fit"
           >
             <div className="flex items-center justify-center p-4 group-hover:bg-sky-600/75 rounded-lg transition-colors">
-              <span className="text-base font-light group-hover:scale-105 transition-transform">
+              <span className="text-sm font-light group-hover:scale-105 transition-transform">
                 {service.title}
               </span>
               <ChevronRight
