@@ -1,5 +1,3 @@
-// app/patients/utils.ts
-
 import { db } from "@/lib/firebase";
 import {
   collection,
@@ -14,9 +12,11 @@ import {
   Timestamp,
   updateDoc,
   serverTimestamp,
+  QueryConstraint,
 } from "firebase/firestore";
 import { toast } from "@/components/ui/use-toast";
 
+// Interfaces
 export interface MedicalRecord {
   date: string;
   description: string;
@@ -31,12 +31,17 @@ export interface Patient {
   phoneNumber?: string;
   address?: string;
   createdAt: Timestamp;
+  primaryCarePhysicianId?: string;
 }
 
 export interface Appointment {
   id: string;
   date: Timestamp;
   status: string;
+  patientId: string;
+  patientName: string;
+  doctorId: string;
+  createdAt: Timestamp;
 }
 
 export interface Doctor {
@@ -63,42 +68,54 @@ export interface ClinicRequest {
   createdAt: Timestamp;
 }
 
+// Helper functions
+const handleError = (error: any, message: string) => {
+  console.error(message, error);
+  toast({
+    title: "Error",
+    description: `${message} Please try again later.`,
+    variant: "destructive",
+  });
+};
+
+const fetchDocuments = async <T>(
+  collectionName: string,
+  queryConstraints: QueryConstraint[]
+): Promise<T[]> => {
+  try {
+    const collectionRef = collection(db, collectionName);
+    const q = query(collectionRef, ...queryConstraints);
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(
+      (doc) => ({ id: doc.id, ...doc.data() } as T)
+    );
+  } catch (error) {
+    handleError(error, `Failed to fetch ${collectionName}.`);
+    return [];
+  }
+};
+// Main functions
 export const fetchPatientData = async (
   userId: string
 ): Promise<Patient | null> => {
   try {
     const patientRef = doc(db, "patients", userId);
     const patientSnap = await getDoc(patientRef);
-    if (patientSnap.exists()) {
-      return patientSnap.data() as Patient;
-    } else {
-      console.log("No patient data found");
-      return null;
-    }
+    return patientSnap.exists() ? (patientSnap.data() as Patient) : null;
   } catch (error) {
-    console.error("Error fetching patient data:", error);
-    toast({
-      title: "Error",
-      description: "Failed to fetch patient data. Please try again later.",
-      variant: "destructive",
-    });
+    handleError(error, "Failed to fetch patient data.");
     return null;
   }
 };
 
 export const fetchVisitCount = async (userId: string): Promise<number> => {
   try {
-    const visitsRef = collection(db, "visits");
-    const q = query(visitsRef, where("patientId", "==", userId));
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.size;
+    const visits = await fetchDocuments("visits", [
+      where("patientId", "==", userId),
+    ]);
+    return visits.length;
   } catch (error) {
-    console.error("Error fetching visit count:", error);
-    toast({
-      title: "Error",
-      description: "Failed to fetch visit count. Please try again later.",
-      variant: "destructive",
-    });
+    handleError(error, "Failed to fetch visit count.");
     return 0;
   }
 };
@@ -107,29 +124,21 @@ export const fetchRecentRecords = async (
   userId: string
 ): Promise<MedicalRecord[]> => {
   try {
-    const recordsRef = collection(db, "medicalRecords");
-    const q = query(
-      recordsRef,
+    const records = await fetchDocuments<{
+      id: string;
+      date: Timestamp;
+      description: string;
+    }>("medicalRecords", [
       where("patientId", "==", userId),
       orderBy("date", "desc"),
-      limit(3)
-    );
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map((doc) => {
-      const data = doc.data();
-      return {
-        date: data.date.toDate().toLocaleString(),
-        description: data.description,
-      };
-    });
+      limit(3),
+    ]);
+    return records.map((record) => ({
+      date: record.date.toDate().toLocaleString(),
+      description: record.description,
+    }));
   } catch (error) {
-    console.error("Error fetching recent records:", error);
-    toast({
-      title: "Error",
-      description:
-        "Failed to fetch recent medical records. Please try again later.",
-      variant: "destructive",
-    });
+    handleError(error, "Failed to fetch recent medical records.");
     return [];
   }
 };
@@ -137,52 +146,14 @@ export const fetchRecentRecords = async (
 export const fetchAppointments = async (
   userId: string
 ): Promise<Appointment[]> => {
-  try {
-    const appointmentsRef = collection(db, "appointments");
-    const q = query(
-      appointmentsRef,
-      where("patientId", "==", userId),
-      orderBy("date", "desc")
-    );
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(
-      (doc) =>
-        ({
-          id: doc.id,
-          ...doc.data(),
-        } as Appointment)
-    );
-  } catch (error) {
-    console.error("Error fetching appointments:", error);
-    toast({
-      title: "Error",
-      description: "Failed to fetch appointments. Please try again later.",
-      variant: "destructive",
-    });
-    return [];
-  }
+  return fetchDocuments("appointments", [
+    where("patientId", "==", userId),
+    orderBy("date", "desc"),
+  ]) as Promise<Appointment[]>;
 };
 
 export const fetchDoctors = async (): Promise<Doctor[]> => {
-  try {
-    const doctorsRef = collection(db, "doctors");
-    const querySnapshot = await getDocs(doctorsRef);
-    return querySnapshot.docs.map(
-      (doc) =>
-        ({
-          id: doc.id,
-          ...doc.data(),
-        } as Doctor)
-    );
-  } catch (error) {
-    console.error("Error fetching doctors:", error);
-    toast({
-      title: "Error",
-      description: "Failed to fetch doctors. Please try again later.",
-      variant: "destructive",
-    });
-    return [];
-  }
+  return fetchDocuments("doctors", []) as Promise<Doctor[]>;
 };
 
 export const scheduleAppointment = async (
@@ -197,8 +168,7 @@ export const scheduleAppointment = async (
     const [hours, minutes] = selectedTime.split(":");
     appointmentDateTime.setHours(parseInt(hours, 10), parseInt(minutes, 10));
 
-    const appointmentsRef = collection(db, "appointments");
-    const newAppointment = {
+    const newAppointment: Omit<Appointment, "id"> = {
       date: Timestamp.fromDate(appointmentDateTime),
       patientId: userId,
       patientName: patientName,
@@ -207,9 +177,7 @@ export const scheduleAppointment = async (
       createdAt: Timestamp.now(),
     };
 
-    const docRef = await addDoc(appointmentsRef, newAppointment);
-
-    console.log("Appointment scheduled with ID: ", docRef.id);
+    const docRef = await addDoc(collection(db, "appointments"), newAppointment);
 
     toast({
       title: "Appointment Scheduled",
@@ -217,14 +185,8 @@ export const scheduleAppointment = async (
     });
 
     return true;
-  } catch (e) {
-    console.error("Error scheduling appointment: ", e);
-    toast({
-      title: "Error",
-      description:
-        "There was an error scheduling your appointment. Please try again.",
-      variant: "destructive",
-    });
+  } catch (error) {
+    handleError(error, "Error scheduling appointment.");
     return false;
   }
 };
@@ -241,9 +203,7 @@ export const requestClinic = async (
   additionalNotes: string
 ): Promise<void> => {
   try {
-    // Check for existing pending requests
-    const existingRequests = await checkExistingRequests(userId);
-    if (existingRequests > 0) {
+    if ((await checkExistingRequests(userId)) > 0) {
       toast({
         title: "Existing Request",
         description:
@@ -253,22 +213,13 @@ export const requestClinic = async (
       return;
     }
 
-    // Validate inputs
-    if (!validateInputs(contactPhone, contactEmail, preferredDate)) {
+    if (
+      !validateInputs(contactPhone, contactEmail, preferredDate) ||
+      !checkRateLimit(userId)
+    ) {
       return;
     }
 
-    // Check rate limiting
-    if (!checkRateLimit(userId)) {
-      toast({
-        title: "Too Many Requests",
-        description: "Please wait before submitting another request.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const clinicRequestsRef = collection(db, "clinicRequests");
     const newRequest: Omit<ClinicRequest, "id"> = {
       patientId: userId,
       patientName: patientName,
@@ -285,14 +236,9 @@ export const requestClinic = async (
       createdAt: Timestamp.now(),
     };
 
-    const docRef = await addDoc(clinicRequestsRef, newRequest);
+    const docRef = await addDoc(collection(db, "clinicRequests"), newRequest);
 
-    console.log("Clinic request submitted successfully");
-
-    // Send notifications
     await sendNotifications(userId, patientName, docRef.id);
-
-    // Log the request
     await logClinicRequest(userId, docRef.id);
 
     toast({
@@ -301,39 +247,78 @@ export const requestClinic = async (
         "Your request for a clinic has been submitted. We will contact you shortly.",
     });
   } catch (error) {
-    console.error("Error requesting clinic:", error);
-    toast({
-      title: "Error",
-      description:
-        "There was an error submitting your clinic request. Please try again.",
-      variant: "destructive",
-    });
+    handleError(error, "Error requesting clinic.");
   }
 };
 
-const checkExistingRequests = async (userId: string): Promise<number> => {
-  const clinicRequestsRef = collection(db, "clinicRequests");
-  const q = query(
-    clinicRequestsRef,
+export const updateClinicRequest = async (
+  requestId: string,
+  updates: Partial<ClinicRequest>
+): Promise<void> => {
+  try {
+    const requestRef = doc(db, "clinicRequests", requestId);
+    await updateDoc(requestRef, {
+      ...updates,
+      statusLastUpdated: serverTimestamp(),
+    });
+
+    toast({
+      title: "Request Updated",
+      description: "Your clinic request has been updated successfully.",
+    });
+
+    await logClinicRequest(updates.patientId!, requestId);
+  } catch (error) {
+    handleError(error, "Error updating clinic request.");
+  }
+};
+
+export const fetchClinicRequests = async (
+  userId: string
+): Promise<ClinicRequest[]> => {
+  return fetchDocuments("clinicRequests", [
     where("patientId", "==", userId),
-    where("status", "==", "pending")
-  );
-  const querySnapshot = await getDocs(q);
-  return querySnapshot.size;
+    orderBy("createdAt", "desc"),
+  ]) as Promise<ClinicRequest[]>;
+};
+
+export const selectPrimaryCarePhysician = async (
+  userId: string,
+  doctorId: string
+): Promise<void> => {
+  try {
+    const patientRef = doc(db, "patients", userId);
+    await updateDoc(patientRef, { primaryCarePhysicianId: doctorId });
+    toast({
+      title: "Primary Care Physician Updated",
+      description: "Your primary care physician has been updated successfully.",
+    });
+  } catch (error) {
+    handleError(error, "Error updating primary care physician.");
+  }
+};
+
+// Helper functions for requestClinic
+const checkExistingRequests = async (userId: string): Promise<number> => {
+  const requests = await fetchDocuments("clinicRequests", [
+    where("patientId", "==", userId),
+    where("status", "==", "pending"),
+  ]);
+  return requests.length;
 };
 
 const validateInputs = (phone: string, email: string, date: Date): boolean => {
-  const phoneRegex = /^\+?[1-9]\d{1,14}$/;
+  //const phoneRegex = /^\+?[1-9]\d{1,14}$/;
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  if (!phoneRegex.test(phone)) {
-    toast({
-      title: "Invalid Phone Number",
-      description: "Please enter a valid phone number.",
-      variant: "destructive",
-    });
-    return false;
-  }
+  // if (phone && !phoneRegex.test(phone)) {
+  //   toast({
+  //     title: "Invalid Phone Number",
+  //     description: "Please enter a valid phone number or leave it blank.",
+  //     variant: "destructive",
+  //   });
+  //   return false;
+  // }
 
   if (!emailRegex.test(email)) {
     toast({
@@ -357,15 +342,22 @@ const validateInputs = (phone: string, email: string, date: Date): boolean => {
 };
 
 const checkRateLimit = async (userId: string): Promise<boolean> => {
-  const clinicRequestsRef = collection(db, "clinicRequests");
   const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-  const q = query(
-    clinicRequestsRef,
+  const recentRequests = await fetchDocuments("clinicRequests", [
     where("patientId", "==", userId),
-    where("createdAt", ">=", Timestamp.fromDate(oneHourAgo))
-  );
-  const querySnapshot = await getDocs(q);
-  return querySnapshot.size < 3; // Allow up to 3 requests per hour
+    where("createdAt", ">=", Timestamp.fromDate(oneHourAgo)),
+  ]);
+
+  if (recentRequests.length >= 3) {
+    toast({
+      title: "Too Many Requests",
+      description: "Please wait before submitting another request.",
+      variant: "destructive",
+    });
+    return false;
+  }
+
+  return true;
 };
 
 const sendNotifications = async (
@@ -373,16 +365,11 @@ const sendNotifications = async (
   patientName: string,
   requestId: string
 ): Promise<void> => {
-  // This is a placeholder function. In a real application, you would integrate
-  // with an email service or push notification system here.
+  // Placeholder for notification logic
   console.log(
     `Sending notification for clinic request ${requestId} by patient ${patientName}`
   );
-
-  // Notify patient
   console.log(`Sending confirmation email to patient ${userId}`);
-
-  // Notify staff
   console.log("Notifying relevant staff about new clinic request");
 };
 
@@ -390,89 +377,10 @@ const logClinicRequest = async (
   userId: string,
   requestId: string
 ): Promise<void> => {
-  const logsRef = collection(db, "clinicRequestLogs");
-  await addDoc(logsRef, {
+  await addDoc(collection(db, "clinicRequestLogs"), {
     userId,
     requestId,
     action: "created",
     timestamp: serverTimestamp(),
   });
-};
-
-export const updateClinicRequest = async (
-  requestId: string,
-  updates: Partial<ClinicRequest>
-): Promise<void> => {
-  try {
-    const requestRef = doc(db, "clinicRequests", requestId);
-    await updateDoc(requestRef, {
-      ...updates,
-      statusLastUpdated: serverTimestamp(),
-    });
-
-    console.log(`Clinic request ${requestId} updated successfully`);
-
-    toast({
-      title: "Request Updated",
-      description: "Your clinic request has been updated successfully.",
-    });
-
-    // Log the update
-    await logClinicRequest(updates.patientId!, requestId);
-  } catch (error) {
-    console.error("Error updating clinic request:", error);
-    toast({
-      title: "Error",
-      description:
-        "There was an error updating your clinic request. Please try again.",
-      variant: "destructive",
-    });
-  }
-};
-
-export const fetchClinicRequests = async (
-  userId: string
-): Promise<ClinicRequest[]> => {
-  try {
-    const clinicRequestsRef = collection(db, "clinicRequests");
-    const q = query(
-      clinicRequestsRef,
-      where("patientId", "==", userId),
-      orderBy("createdAt", "desc")
-    );
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(
-      (doc) => ({ id: doc.id, ...doc.data() } as ClinicRequest)
-    );
-  } catch (error) {
-    console.error("Error fetching clinic requests:", error);
-    toast({
-      title: "Error",
-      description: "Failed to fetch clinic requests. Please try again later.",
-      variant: "destructive",
-    });
-    return [];
-  }
-};
-
-export const selectPrimaryCarePhysician = async (
-  userId: string,
-  doctorId: string
-): Promise<void> => {
-  try {
-    const patientRef = doc(db, "patients", userId);
-    await updateDoc(patientRef, { primaryCarePhysicianId: doctorId });
-    toast({
-      title: "Primary Care Physician Updated",
-      description: "Your primary care physician has been updated successfully.",
-    });
-  } catch (error) {
-    console.error("Error updating primary care physician:", error);
-    toast({
-      title: "Error",
-      description:
-        "There was an error updating your primary care physician. Please try again.",
-      variant: "destructive",
-    });
-  }
 };

@@ -110,7 +110,7 @@ const PatientPage = () => {
     setIsSubmitting(true);
 
     try {
-      await scheduleAppointment(
+      const success = await scheduleAppointment(
         user.uid,
         patientData.displayName || user.email || "",
         date,
@@ -118,23 +118,15 @@ const PatientPage = () => {
         selectedDoctor
       );
 
-      toast({
-        title: "Appointment Scheduled",
-        description: "Your appointment has been successfully scheduled.",
-      });
-
-      const updatedAppointments = await fetchAppointments(user.uid);
-      setAppointments(updatedAppointments);
-      setDate(undefined);
-      setSelectedTime("");
-      setSelectedDoctor(null);
+      if (success) {
+        const updatedAppointments = await fetchAppointments(user.uid);
+        setAppointments(updatedAppointments);
+        setDate(undefined);
+        setSelectedTime("");
+        setSelectedDoctor(null);
+      }
     } catch (error) {
       console.error("Error scheduling appointment:", error);
-      toast({
-        title: "Error",
-        description: "Failed to schedule appointment. Please try again.",
-        variant: "destructive",
-      });
     } finally {
       setIsSubmitting(false);
     }
@@ -143,11 +135,13 @@ const PatientPage = () => {
   const handleRequestClinic = async () => {
     if (!user || !patientData || !preferredDate) return;
 
+    setIsSubmitting(true);
+
     try {
       await requestClinic(
         user.uid,
         patientData.displayName || user.email || "",
-        patientData.phoneNumber || "",
+        patientData.phoneNumber || "", // Pass an empty string if phone number is not available
         patientData.email,
         preferredDate,
         reason,
@@ -155,11 +149,6 @@ const PatientPage = () => {
         urgency,
         additionalNotes
       );
-
-      toast({
-        title: "Clinic Request Submitted",
-        description: "Your clinic request has been successfully submitted.",
-      });
 
       const updatedRequests = await fetchClinicRequests(user.uid);
       setClinicRequests(updatedRequests);
@@ -174,6 +163,8 @@ const PatientPage = () => {
         description: "Failed to submit clinic request. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -185,17 +176,8 @@ const PatientPage = () => {
       await updateClinicRequest(requestId, updates);
       const updatedRequests = await fetchClinicRequests(user!.uid);
       setClinicRequests(updatedRequests);
-      toast({
-        title: "Request Updated",
-        description: "Your clinic request has been updated successfully.",
-      });
     } catch (error) {
       console.error("Error updating clinic request:", error);
-      toast({
-        title: "Error",
-        description: "Failed to update clinic request. Please try again.",
-        variant: "destructive",
-      });
     }
   };
 
@@ -204,19 +186,8 @@ const PatientPage = () => {
     try {
       await selectPrimaryCarePhysician(user.uid, doctorId);
       setSelectedDoctor(doctorId);
-      toast({
-        title: "Primary Care Physician Updated",
-        description:
-          "Your primary care physician has been updated successfully.",
-      });
     } catch (error) {
       console.error("Error updating primary care physician:", error);
-      toast({
-        title: "Error",
-        description:
-          "Failed to update primary care physician. Please try again.",
-        variant: "destructive",
-      });
     }
   };
 
@@ -423,8 +394,12 @@ const PatientPage = () => {
                         placeholder="Any additional information you'd like to provide"
                       />
                     </div>
-                    <Button onClick={handleRequestClinic} className="w-full">
-                      Submit Clinic Request
+                    <Button
+                      onClick={handleRequestClinic}
+                      className="w-full"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? "Submitting..." : "Submit Clinic Request"}
                     </Button>
                   </div>
                 </CardContent>
