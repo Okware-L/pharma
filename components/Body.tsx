@@ -1,203 +1,228 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { ChevronRight, Check } from "lucide-react";
 
-// Main Body Component
 const Body = () => {
+  const features = [
+    {
+      title: "Health Records",
+      description: "Secure access to your complete medical history",
+    },
+    {
+      title: "Telehealth",
+      description: "On-demand video consultations with specialists",
+    },
+    {
+      title: "Personalized Care",
+      description: "AI-driven care plans and smart reminders",
+    },
+    {
+      title: "Health Tracking",
+      description: "Integrate wearables for real-time health monitoring",
+    },
+  ];
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.3,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 100,
+      },
+    },
+  };
+
   return (
-    <div className="bg-gradient-to-b from-sky-100 to-white">
-      {/* Introduction for Patients & Doctors */}
-      <section className="py-16 px-4 md:px-8 lg:px-16">
-        <div className="grid md:grid-cols-2 gap-10">
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-            className="bg-indigo-100 p-8 rounded-lg shadow-md"
-          >
-            <h2 className="text-3xl font-bold text-indigo-900 mb-4">
-              Your Health, Your Way
-            </h2>
-            <p className="text-slate-900 mb-6">
-              Welcome to a new era of healthcare. Manage your health records,
-              consult with top specialists, and stay informed—all from the
-              comfort of your home. Your well-being is just a click away.
-            </p>
-            <ul className="text-slate-900 list-disc pl-5 mb-6">
-              <li>Easy access to your medical records</li>
-              <li>Online consultations with certified doctors</li>
-              <li>24/7 support and emergency care</li>
-            </ul>
-            <Button asChild>
-              <Link href="/signup">Get Started</Link>
-            </Button>
-          </motion.div>
+    <div className="bg-gradient-to-b from-sky-50 to-white">
+      {/* Section 1: Introduction */}
+      <section className="py-20 sm:py-32">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-4xl mx-auto text-center">
+            <motion.h2
+              className="text-4xl sm:text-5xl font-extrabold text-sky-900 mb-6"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              Revolutionizing Healthcare Access
+            </motion.h2>
+            <motion.p
+              className="text-xl text-sky-700 mb-10"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              Experience seamless health management with cutting-edge technology
+              and compassionate care, all at your fingertips.
+            </motion.p>
+            <motion.div
+              className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
+              <Button
+                asChild
+                className="bg-sky-600 hover:bg-sky-700 text-white px-8 py-3 rounded-full transition-colors text-lg font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+              >
+                <Link href="/signup">Get Started</Link>
+              </Button>
+              <Button
+                asChild
+                className="bg-white hover:bg-sky-50 text-sky-600 px-8 py-3 rounded-full transition-colors text-lg font-semibold border-2 border-sky-600 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+              >
+                <Link href="/learn-more">Learn More</Link>
+              </Button>
+            </motion.div>
+          </div>
+        </div>
+      </section>
 
+      {/* Section 2: Key Features */}
+      <section className="py-20 sm:py-32 bg-sky-800 text-white">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl sm:text-4xl font-bold text-center mb-16">
+            Empowering Features
+          </h2>
           <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-            className="bg-indigo-100 p-8 rounded-lg shadow-md"
+            className="grid md:grid-cols-2 lg:grid-cols-4 gap-8"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
           >
-            <h2 className="text-3xl font-bold text-indigo-900 mb-4">
-              Join Our Network of Top Physicians
-            </h2>
-            <p className="text-slate-900 mb-6">
-              Be a part of a revolutionary healthcare platform. Expand your
-              practice, reach more patients, and make a difference—anytime,
-              anywhere.
-            </p>
-            <ul className="text-slate-900 list-disc pl-5 mb-6">
-              <li>Expand your reach with telemedicine</li>
-              <li>Flexible working hours</li>
-              <li>Access to cutting-edge technology</li>
-            </ul>
-            <Button asChild>
-              <Link href="/apply">Apply Now</Link>
-            </Button>
+            {features.map((feature, index) => (
+              <motion.div
+                key={index}
+                variants={itemVariants}
+                className="bg-sky-700 p-6 rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300 flex flex-col"
+              >
+                <div className="flex-grow">
+                  <Check className="text-sky-300 mb-4" size={28} />
+                  <h3 className="text-xl font-semibold mb-3">
+                    {feature.title}
+                  </h3>
+                  <p className="text-sky-100">{feature.description}</p>
+                </div>
+                <Link
+                  href={`/feature/${feature.title
+                    .toLowerCase()
+                    .replace(/\s+/g, "-")}`}
+                  className="mt-4 inline-flex items-center text-sky-300 hover:text-sky-100 transition-colors"
+                >
+                  Learn more <ChevronRight size={16} className="ml-1" />
+                </Link>
+              </motion.div>
+            ))}
           </motion.div>
         </div>
       </section>
 
-      {/* Key Features & Benefits */}
-      <section className="py-16 bg-indigo-50">
-        <div className="grid md:grid-cols-3 gap-10 px-4 md:px-8 lg:px-16">
+      {/* Section 3: Testimonial */}
+      <section className="py-20 sm:py-32 bg-gradient-to-r from-sky-600 to-sky-700 text-white overflow-hidden">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
           <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
+            className="max-w-3xl mx-auto text-center relative z-10"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
-            className="bg-white p-8 rounded-lg shadow-lg text-center"
           >
-            <h3 className="text-xl font-semibold text-indigo-900 mb-4">
-              Comprehensive Health Records
-            </h3>
-            <p className="text-slate-900">
-              All your health data in one secure place. Easily track, share, and
-              manage your medical history.
-            </p>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="bg-white p-8 rounded-lg shadow-lg text-center"
-          >
-            <h3 className="text-xl font-semibold text-indigo-900 mb-4">
-              Seamless Telehealth Experience
-            </h3>
-            <p className="text-slate-900">
-              Consult with doctors through video, audio, or chat. Get
-              prescriptions and follow-ups, hassle-free.
-            </p>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="bg-white p-8 rounded-lg shadow-lg text-center"
-          >
-            <h3 className="text-xl font-semibold text-indigo-900 mb-4">
-              Patient-Centered Care
-            </h3>
-            <p className="text-slate-900">
-              Our platform is designed with you in mind. Personalized care plans
-              and reminders to keep you on track.
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Testimonials & Success Stories */}
-      <section className="py-16 px-4 md:px-8 lg:px-16 bg-sky-50">
-        <h2 className="text-3xl font-bold text-center text-indigo-900 mb-12">
-          What Our Users Are Saying
-        </h2>
-        <div className="grid md:grid-cols-2 gap-10">
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-            className="p-8 bg-white rounded-lg shadow-lg"
-          >
-            <p className="italic text-slate-900 mb-4">
-              "This app has made managing my chronic condition so much easier. I
-              can consult with my doctor anytime without leaving home."
-            </p>
-            <p className="text-right font-bold text-indigo-900">
-              — Sarah P., Patient
-            </p>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-            className="p-8 bg-white rounded-lg shadow-lg"
-          >
-            <p className="italic text-slate-900 mb-4">
-              "Being part of this platform has allowed me to connect with more
-              patients and offer flexible care options."
-            </p>
-            <p className="text-right font-bold text-indigo-900">
-              — Dr. James L., Physician
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Call-to-Action & Signup Forms */}
-      <section className="py-16 bg-indigo-900 text-white">
-        <div className="grid md:grid-cols-2 gap-10 px-4 md:px-8 lg:px-16">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="bg-sky-950/75 p-8 rounded-lg shadow-md"
-          >
-            <h2 className="text-3xl font-bold mb-4">
-              Ready to Take Control of Your Health?
+            <h2 className="text-3xl sm:text-4xl font-bold mb-8">
+              Transforming Lives
             </h2>
-            <Button asChild className="w-full mt-6">
-              <Link href="/signup">Sign Up Now</Link>
-            </Button>
+            <blockquote className="text-xl sm:text-2xl italic mb-6">
+              "This platform has not just improved my health management; it's
+              given me back control over my life. The convenience and quality of
+              care are unmatched."
+            </blockquote>
+            <p className="font-semibold">— Sarah P., Chronic Care Patient</p>
           </motion.div>
-
           <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="bg-sky-950/75 p-8 rounded-lg shadow-md"
+            className="absolute top-0 left-0 w-full h-full opacity-10"
+            initial={{ rotate: 0 }}
+            animate={{ rotate: 360 }}
+            transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
           >
-            <h2 className="text-3xl font-bold mb-4">
-              Join Our Medical Network
-            </h2>
-            <Button asChild className="w-full mt-6">
-              <Link href="/apply">Apply Today</Link>
-            </Button>
+            <div className="w-full h-full bg-[url('/pattern.svg')] bg-repeat"></div>
           </motion.div>
         </div>
       </section>
 
-      {/* Closing Statement & Newsletter Signup */}
-      <section className="py-12 bg-indigo-100 text-center">
-        <h2 className="text-3xl font-bold text-indigo-900 mb-6">
-          Stay Connected with Us
-        </h2>
-        <p className="text-slate-900 mb-6">
-          Sign up for our newsletter to get the latest updates, health tips, and
-          more.
-        </p>
-        <form className="max-w-md mx-auto">
-          <input
-            type="email"
-            placeholder="Enter your email"
-            className="w-full p-3 rounded-full border border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-          <Button className="w-full mt-4 bg-sky-950 hover:bg-sky-800 text-white px-8 py-3 rounded-full transition-colors">
-            Subscribe
-          </Button>
-        </form>
+      {/* Section 4: Call-to-Action */}
+      <section className="py-20 sm:py-32 bg-white">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl mx-auto text-center">
+            <motion.h2
+              className="text-3xl sm:text-4xl font-bold text-sky-900 mb-6"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              Ready to Transform Your Healthcare Experience?
+            </motion.h2>
+            <motion.p
+              className="text-xl text-sky-700 mb-10"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              Join thousands of satisfied users who've taken control of their
+              health journey.
+            </motion.p>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
+              <Button
+                asChild
+                className="bg-sky-600 hover:bg-sky-700 text-white px-10 py-4 rounded-full transition-all text-lg font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+              >
+                <Link href="/signup">Get Started Now</Link>
+              </Button>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section 5: Newsletter Signup */}
+      <section className="py-20 sm:py-32 bg-sky-50">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-xl mx-auto">
+            <h2 className="text-3xl sm:text-4xl font-bold text-sky-900 text-center mb-8">
+              Stay Informed
+            </h2>
+            <p className="text-sky-700 text-center mb-8">
+              Get the latest health insights and platform updates delivered to
+              your inbox.
+            </p>
+            <form className="flex flex-col sm:flex-row shadow-lg rounded-full overflow-hidden">
+              <input
+                type="email"
+                placeholder="Enter your email"
+                className="flex-grow p-4 sm:p-5 border-none focus:outline-none focus:ring-2 focus:ring-sky-500 text-sky-900"
+              />
+              <Button className="bg-sky-600 hover:bg-sky-700 text-white px-8 py-4 sm:py-5 transition-colors text-lg font-semibold">
+                Subscribe
+              </Button>
+            </form>
+          </div>
+        </div>
       </section>
     </div>
   );
