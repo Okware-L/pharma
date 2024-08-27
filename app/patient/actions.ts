@@ -68,7 +68,14 @@ export interface ClinicRequest {
   createdAt: Timestamp;
 }
 
-// Helper functions
+/**
+ * Handles errors by logging them to the console and displaying a toast notification.
+ * This function centralizes error handling across the application, ensuring
+ * consistent error reporting and user feedback.
+ *
+ * @param error - The error object caught in a try-catch block
+ * @param message - A custom error message to display to the user
+ */
 const handleError = (error: any, message: string) => {
   console.error(message, error);
   toast({
@@ -78,6 +85,15 @@ const handleError = (error: any, message: string) => {
   });
 };
 
+/**
+ * Fetches documents from a specified Firestore collection based on given query constraints.
+ * This is a generic function that can be used to fetch any type of document from any collection,
+ * making it highly reusable across the application.
+ *
+ * @param collectionName - The name of the Firestore collection to query
+ * @param queryConstraints - An array of Firebase query constraints to apply to the query
+ * @returns A Promise that resolves to an array of documents of type T
+ */
 const fetchDocuments = async <T>(
   collectionName: string,
   queryConstraints: QueryConstraint[]
@@ -94,7 +110,15 @@ const fetchDocuments = async <T>(
     return [];
   }
 };
-// Main functions
+
+/**
+ * Fetches patient data for a specific user from the Firestore database.
+ * This function retrieves all the information associated with a patient,
+ * including personal details, medical history, and preferences.
+ *
+ * @param userId - The unique identifier of the user/patient
+ * @returns A Promise that resolves to a Patient object if found, or null if not found
+ */
 export const fetchPatientData = async (
   userId: string
 ): Promise<Patient | null> => {
@@ -108,6 +132,14 @@ export const fetchPatientData = async (
   }
 };
 
+/**
+ * Retrieves the total number of visits for a specific patient.
+ * This function is useful for tracking patient engagement and visit frequency,
+ * which can be important for healthcare providers and administrators.
+ *
+ * @param userId - The unique identifier of the user/patient
+ * @returns A Promise that resolves to the number of visits
+ */
 export const fetchVisitCount = async (userId: string): Promise<number> => {
   try {
     const visits = await fetchDocuments("visits", [
@@ -120,6 +152,14 @@ export const fetchVisitCount = async (userId: string): Promise<number> => {
   }
 };
 
+/**
+ * Fetches the most recent medical records for a specific patient.
+ * This function retrieves the latest medical information, which is crucial
+ * for providing up-to-date care and making informed medical decisions.
+ *
+ * @param userId - The unique identifier of the user/patient
+ * @returns A Promise that resolves to an array of MedicalRecord objects
+ */
 export const fetchRecentRecords = async (
   userId: string
 ): Promise<MedicalRecord[]> => {
@@ -143,6 +183,14 @@ export const fetchRecentRecords = async (
   }
 };
 
+/**
+ * Retrieves all appointments for a specific patient, ordered by date.
+ * This function is essential for managing patient schedules and ensuring
+ * that healthcare providers have an accurate view of upcoming appointments.
+ *
+ * @param userId - The unique identifier of the user/patient
+ * @returns A Promise that resolves to an array of Appointment objects
+ */
 export const fetchAppointments = async (
   userId: string
 ): Promise<Appointment[]> => {
@@ -152,10 +200,29 @@ export const fetchAppointments = async (
   ]) as Promise<Appointment[]>;
 };
 
+/**
+ * Fetches all doctors registered in the system.
+ * This function is useful for populating doctor selection dropdowns,
+ * displaying doctor information, and managing doctor-patient relationships.
+ *
+ * @returns A Promise that resolves to an array of Doctor objects
+ */
 export const fetchDoctors = async (): Promise<Doctor[]> => {
   return fetchDocuments("doctors", []) as Promise<Doctor[]>;
 };
 
+/**
+ * Schedules a new appointment for a patient with a selected doctor.
+ * This function handles the entire appointment creation process, including
+ * data validation, Firestore document creation, and user notification.
+ *
+ * @param userId - The unique identifier of the user/patient
+ * @param patientName - The name of the patient
+ * @param date - The date of the appointment
+ * @param selectedTime - The time of the appointment
+ * @param selectedDoctor - The unique identifier of the selected doctor
+ * @returns A Promise that resolves to a boolean indicating success or failure
+ */
 export const scheduleAppointment = async (
   userId: string,
   patientName: string,
@@ -191,6 +258,23 @@ export const scheduleAppointment = async (
   }
 };
 
+/**
+ * Submits a new clinic request for a patient.
+ * This function manages the entire process of creating a clinic request,
+ * including checking for existing requests, validating inputs, enforcing
+ * rate limits, creating the Firestore document, sending notifications,
+ * and logging the request.
+ *
+ * @param userId - The unique identifier of the user/patient
+ * @param patientName - The name of the patient
+ * @param contactPhone - The patient's contact phone number
+ * @param contactEmail - The patient's contact email address
+ * @param preferredDate - The preferred date for the clinic visit
+ * @param reason - The reason for the clinic request
+ * @param primaryCarePhysicianId - The ID of the patient's primary care physician (if any)
+ * @param urgency - The urgency level of the request (routine, urgent, or emergency)
+ * @param additionalNotes - Any additional notes or information about the request
+ */
 export const requestClinic = async (
   userId: string,
   patientName: string,
@@ -251,6 +335,15 @@ export const requestClinic = async (
   }
 };
 
+/**
+ * Updates an existing clinic request with new information.
+ * This function allows for modifications to clinic requests, such as
+ * changing the status or updating other details. It also logs the update
+ * for record-keeping purposes.
+ *
+ * @param requestId - The unique identifier of the clinic request
+ * @param updates - An object containing the fields to be updated
+ */
 export const updateClinicRequest = async (
   requestId: string,
   updates: Partial<ClinicRequest>
@@ -273,6 +366,14 @@ export const updateClinicRequest = async (
   }
 };
 
+/**
+ * Fetches all clinic requests for a specific patient.
+ * This function retrieves the full history of clinic requests made by a patient,
+ * which is useful for tracking request status and managing patient care.
+ *
+ * @param userId - The unique identifier of the user/patient
+ * @returns A Promise that resolves to an array of ClinicRequest objects
+ */
 export const fetchClinicRequests = async (
   userId: string
 ): Promise<ClinicRequest[]> => {
@@ -282,6 +383,14 @@ export const fetchClinicRequests = async (
   ]) as Promise<ClinicRequest[]>;
 };
 
+/**
+ * Updates the primary care physician for a specific patient.
+ * This function allows patients to change their designated primary care
+ * physician, which is important for managing ongoing care and referrals.
+ *
+ * @param userId - The unique identifier of the user/patient
+ * @param doctorId - The unique identifier of the selected doctor
+ */
 export const selectPrimaryCarePhysician = async (
   userId: string,
   doctorId: string
@@ -298,7 +407,14 @@ export const selectPrimaryCarePhysician = async (
   }
 };
 
-// Helper functions for requestClinic
+/**
+ * Checks for existing pending clinic requests for a specific patient.
+ * This helper function is used to prevent duplicate requests and ensure
+ * that patients don't overwhelm the system with multiple pending requests.
+ *
+ * @param userId - The unique identifier of the user/patient
+ * @returns A Promise that resolves to the number of pending requests
+ */
 const checkExistingRequests = async (userId: string): Promise<number> => {
   const requests = await fetchDocuments("clinicRequests", [
     where("patientId", "==", userId),
@@ -307,18 +423,20 @@ const checkExistingRequests = async (userId: string): Promise<number> => {
   return requests.length;
 };
 
-const validateInputs = (phone: string, email: string, date: Date): boolean => {
-  //const phoneRegex = /^\+?[1-9]\d{1,14}$/;
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// ... (previous code remains the same)
 
-  // if (phone && !phoneRegex.test(phone)) {
-  //   toast({
-  //     title: "Invalid Phone Number",
-  //     description: "Please enter a valid phone number or leave it blank.",
-  //     variant: "destructive",
-  //   });
-  //   return false;
-  // }
+/**
+ * Validates user inputs for clinic requests.
+ * This helper function ensures that the provided contact information and
+ * preferred date are valid before allowing a clinic request to be submitted.
+ *
+ * @param phone - The provided phone number
+ * @param email - The provided email address
+ * @param date - The preferred date for the clinic visit
+ * @returns A boolean indicating whether the inputs are valid
+ */
+const validateInputs = (phone: string, email: string, date: Date): boolean => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   if (!emailRegex.test(email)) {
     toast({
@@ -341,6 +459,14 @@ const validateInputs = (phone: string, email: string, date: Date): boolean => {
   return true;
 };
 
+/**
+ * Checks if a user has exceeded the rate limit for submitting clinic requests.
+ * This helper function prevents abuse of the system by limiting the number
+ * of requests a user can make within a specific time frame (1 hour in this case).
+ *
+ * @param userId - The unique identifier of the user/patient
+ * @returns A Promise that resolves to a boolean indicating whether the user is within the rate limit
+ */
 const checkRateLimit = async (userId: string): Promise<boolean> => {
   const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
   const recentRequests = await fetchDocuments("clinicRequests", [
@@ -360,6 +486,16 @@ const checkRateLimit = async (userId: string): Promise<boolean> => {
   return true;
 };
 
+/**
+ * Sends notifications related to a new clinic request.
+ * This helper function manages the process of notifying relevant parties
+ * (e.g., staff, the patient) about a new clinic request. It's currently
+ * a placeholder for more complex notification logic.
+ *
+ * @param userId - The unique identifier of the user/patient
+ * @param patientName - The name of the patient
+ * @param requestId - The unique identifier of the clinic request
+ */
 const sendNotifications = async (
   userId: string,
   patientName: string,
@@ -373,6 +509,14 @@ const sendNotifications = async (
   console.log("Notifying relevant staff about new clinic request");
 };
 
+/**
+ * Logs a clinic request action in the database.
+ * This helper function creates a record of clinic request actions,
+ * which is useful for auditing, tracking, and analyzing request patterns.
+ *
+ * @param userId - The unique identifier of the user/patient
+ * @param requestId - The unique identifier of the clinic request
+ */
 const logClinicRequest = async (
   userId: string,
   requestId: string
