@@ -117,7 +117,6 @@ export const PatientDashboard: React.FC<PatientDashboardProps> = ({ user }) => {
 
         <TabsContent value="clinic-requests" className="space-y-8">
           <ClinicRequestForm
-            userId={user.uid}
             patientName={patientData.displayName}
             patientEmail={patientData.email}
             patientPhone={patientData.phoneNumber || ""}

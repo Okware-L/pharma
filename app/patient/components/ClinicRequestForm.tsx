@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,10 +12,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { requestClinic } from "../actions";
+import { toast } from "@/components/ui/use-toast";
+import { getAuth } from "firebase/auth";
+import {
+  doc,
+  getDoc,
+  collection,
+  addDoc,
+  Timestamp,
+  serverTimestamp,
+} from "firebase/firestore";
+import { db } from "@/lib/firebase"; // Adjust this import path as needed
 
 interface ClinicRequestFormProps {
-  userId: string;
   patientName: string;
   patientEmail: string;
   patientPhone: string;
@@ -25,7 +32,6 @@ interface ClinicRequestFormProps {
 }
 
 export const ClinicRequestForm: React.FC<ClinicRequestFormProps> = ({
-  userId,
   patientName,
   patientEmail,
   patientPhone,
@@ -41,29 +47,111 @@ export const ClinicRequestForm: React.FC<ClinicRequestFormProps> = ({
   const [additionalNotes, setAdditionalNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const requestClinic = async (): Promise<boolean> => {
+    console.log("Starting requestClinic function");
+
+    try {
+      // Check user authentication
+      const auth = getAuth();
+      const user = auth.currentUser;
+
+      if (!user) {
+        console.error("User not authenticated");
+        toast({
+          title: "Authentication Error",
+          description: "Please sign in to request a clinic appointment.",
+          variant: "destructive",
+        });
+        return false;
+      }
+
+      console.log("Authenticated user ID:", user.uid);
+
+      // Verify user role
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+
+      if (!userDoc.exists()) {
+        console.error("User document not found");
+        toast({
+          title: "User Error",
+          description: "User profile not found. Please contact support.",
+          variant: "destructive",
+        });
+        return false;
+      }
+
+      const userData = userDoc.data();
+      console.log("User data:", userData);
+
+      if (userData?.role !== "patient") {
+        console.error("User is not a patient");
+        toast({
+          title: "Permission Error",
+          description: "Only patients can request clinic appointments.",
+          variant: "destructive",
+        });
+        return false;
+      }
+
+      // Create new request object
+      const newRequest = {
+        patientId: user.uid,
+        patientName,
+        contactPhone: patientPhone,
+        contactEmail: patientEmail,
+        preferredDate: Timestamp.fromDate(preferredDate!),
+        reason,
+        primaryCarePhysicianId: null,
+        status: "pending",
+        statusLastUpdated: serverTimestamp(),
+        medicalRecordLink: `/patients/${user.uid}/medical-record`,
+        urgency,
+        additionalNotes,
+        createdAt: serverTimestamp(),
+      };
+
+      console.log("New request object:", newRequest);
+
+      // Attempt to add the document
+      console.log("Attempting to add document to clinicRequests collection");
+      const docRef = await addDoc(collection(db, "clinicRequests"), newRequest);
+
+      console.log("Document added successfully. Document ID:", docRef.id);
+
+      toast({
+        title: "Clinic Request Submitted",
+        description:
+          "Your request for a clinic appointment has been submitted. We will contact you shortly.",
+      });
+
+      return true;
+    } catch (error) {
+      console.error("Error in requestClinic:", error);
+      toast({
+        title: "Error",
+        description:
+          "An error occurred while submitting your request. Please try again later.",
+        variant: "destructive",
+      });
+      return false;
+    }
+  };
+
   const handleRequestClinic = async () => {
     if (!preferredDate) return;
 
     setIsSubmitting(true);
 
     try {
-      await requestClinic(
-        userId,
-        patientName,
-        patientPhone,
-        patientEmail,
-        preferredDate,
-        reason,
-        null, // primaryCarePhysicianId
-        urgency,
-        additionalNotes
-      );
+      const success = await requestClinic();
 
-      onRequestSubmitted();
-      setPreferredDate(undefined);
-      setReason("");
-      setUrgency("routine");
-      setAdditionalNotes("");
+      if (success) {
+        onRequestSubmitted();
+        setPreferredDate(undefined);
+        setReason("");
+        setUrgency("routine");
+        setAdditionalNotes("");
+      }
     } catch (error) {
       console.error("Error submitting clinic request:", error);
     } finally {
